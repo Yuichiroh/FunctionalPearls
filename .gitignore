@@ -6,9 +6,22 @@
 .DS_Store
 bin
 /tmp
-target/
-classes
 out
 tmp
+*.class
+*.log
 
-# for the current directory
+# sbt specific
+.cache/
+.history/
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
