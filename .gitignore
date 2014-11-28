@@ -1,0 +1,14 @@
+# in general
+.settings
+.worksheet
+.cache
+.idea
+.DS_Store
+bin
+/tmp
+target/
+classes
+out
+tmp
+
+# for the current directory
