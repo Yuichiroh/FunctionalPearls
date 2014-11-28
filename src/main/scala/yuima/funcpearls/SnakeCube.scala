@@ -6,29 +6,105 @@ package yuima.funcpearls
   *         Created on 14/11/28.
   */
 object SnakeCube extends App {
-  /** define a snake */
-  val snake = List(3, 2, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 2, 3, 3, 3, 3)
-  val cubes = snake.sum - (snake.size - 1)
+  type Section = List[Position]
+  type Solution = List[Section]
 
+  val snake = List(3, 2, 2, 3, 2, 3, 2, 2, 3, 3, 2, 2, 2, 3, 3, 3, 3)
+
+  val standard = SnakeCubePuzzle(
+    sections = snake,
+    valid = inCube(3) _,
+    initialSolution = List(List(Position(1, 1, 1))),
+    initialDirection = Direction(0, 0, 1)
+  )
+
+  val meanGreen = standard.copy(sections = List(3, 3, 2, 3, 2, 3, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3))
+
+  val king = standard.copy(valid = inCube(4) _, sections = List(
+    3, 2, 3, 2, 2, 4, 2, 3, 2, 3, 2, 3, 2, 2, 2,
+    2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 3, 4, 2,
+    2, 2, 4, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2)
+  )
+
+  val king1 = king.copy(initialSolution = List(List(Position(2, 1, 1))))
+
+  val king2 = king.copy(initialSolution = List(List(Position(1, 2, 2))))
+
+  solutions(reversePuzzle(standard)).foreach(println)
+
+  /** checks whether a given cube location is valid for a solution (it should be inside of the large cube).
+    * @param size the cube size of the solution (i.e. the cube is size * size * size)
+    * @param pos  the position of a target cube.
+    **/
   def inCube(size: Int)(pos: Position) = {
     def inRange(k: Int) = 1 <= k && k <= size
 
     inRange(pos.x) && inRange(pos.y) && inRange(pos.z)
   }
 
-  def section(start: Position)(dir: Direction)(length: Int) = {
-    def pieces = Stream.iterate(start) { pos: Position => Position(pos.x + dir.u, pos.y + dir.v, pos.z + dir.w)}
-    pieces.take(length - 1).reverse
+  /** gets solutions of a puzzle using a brute force algorithm. */
+  def solutions(p: SnakeCubePuzzle) = {
+    def solve(solution: Solution)(prevDir: Direction)(sections: List[Int]): List[Solution] = sections match {
+      case Nil => List(solution)
+      case length :: secs =>
+        newDirections(prevDir).flatMap { newDir =>
+          extend(p)(solution)(newDir)(length).flatMap { newSolution => solve(newSolution)(newDir)(secs) }
+        }
+    }
+
+    solve(p.initialSolution)(p.initialDirection)(p.sections)
   }
+
+  /** gets possible directions for a next move. */
+  def newDirections(prev: Direction) = List(
+    Direction(prev.v, prev.w, prev.u),
+    Direction(-prev.v, -prev.w, -prev.u),
+    Direction(prev.w, prev.u, prev.v),
+    Direction(-prev.w, -prev.u, -prev.v)
+  )
+
+  /** extends current move sequences with a move toward a particular direction.
+    * Note: we must ensure that all of the positions in next section are valid in the given puzzle,
+    * and we must also check that none of the positions in next section have already been occupied by
+    * other sections in the starting solution.
+    * @param p        puzzle definition
+    * @param solution the move sequence so far
+    * @param dir      the direction of a next move
+    * @param length   the cube length of the next section
+    **/
+  def extend(p: SnakeCubePuzzle)(solution: Solution)(dir: Direction)(length: Int) = {
+    val start = solution.head.head
+    val nextSec = section(start)(dir)(length)
+    if (nextSec.forall(p.valid) && solution.forall(sec => (nextSec intersect sec).isEmpty)) List(nextSec :: solution)
+    else Nil
+  }
+
+  /** obtains small-cube positions for a next move.
+    * @param start  the beginning position of the move.
+    * @param d      the direction of the move.
+    * @param length the small-cube length of the move.
+    * */
+  def section(start: Position)(d: Direction)(length: Int) = {
+    def pieces = Stream.iterate(start) { pos: Position => Position(pos.x + d.u, pos.y + d.v, pos.z + d.w) }
+    pieces.take(length).tail.reverse.toList
+  }
+
+  /** creates a variant of a puzzle by reversing the order of the sections. */
+  def reversePuzzle(p: SnakeCubePuzzle) = p.copy(sections = p.sections.reverse)
+
+  /** converts an objective of the puzzle to a different one --that is to find the most-compact,
+    * flat form where all of the sections in a single level. (i.e. z == 1 for all cubes) */
+  def flatPuzzle(p: SnakeCubePuzzle) = p.copy(valid = (pos: Position) => pos.z == 1)
+
+  /** SnakeCube puzzle interface */
+  case class SnakeCubePuzzle(sections: List[Int],
+                             valid: Position => Boolean,
+                             initialSolution: Solution,
+                             initialDirection: Direction)
 
   case class Direction(u: Int, v: Int, w: Int) {
     require(u.abs + v.abs + w.abs == 1 && u.abs <= 1 && v.abs <= 1 && w.abs <= 1)
   }
 
   case class Position(x: Int, y: Int, z: Int)
-
-  case class Section(positions: List[Position])
-
-  case class Solution(sections: List[Section])
-
 }
