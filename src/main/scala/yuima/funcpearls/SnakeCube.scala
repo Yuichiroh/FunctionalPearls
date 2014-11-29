@@ -37,33 +37,7 @@ object SnakeCube {
   val colors = Iterator.continually(Seq("brown", "white")).flatten
 
   def main(args: Array[String]) {
-    println(showSteps(standard))
-  }
-
-  /** returns sketch format data representing a one of the solution. */
-  def showSteps(p: SnakeCubePuzzle) = steps(solutions(p).head).map(showCubes).mkString("\n")
-
-  def steps(solution: Solution) = solution.map(_.reverse).reverse.tail
-
-  /** returns polygon info of cubes for the sketching tool.
-    * @param positions the cube positions
-    **/
-  def showCubes(positions: List[Position]) = positions.map(p => cube2sketch(colors.next)(p)).mkString("\n")
-
-  /** returns polygon info of a single cube for the sketching tool. */
-  def cube2sketch(color: String)(a: Position) = {
-    val prefix = s"polygon[fill=$color]"
-    val Position(x, y, z) = a
-    val b = (x, y, z - 1)
-    val c = (x, y - 1, z)
-    val d = (x - 1, y, z)
-    val e = (x, y - 1, z - 1)
-    val f = (x - 1, y, z - 1)
-    val g = (x - 1, y - 1, z)
-    val h = (x - 1, y - 1, z - 1)
-    val faces = List(List(a, d, g, c), List(b, e, h, f), List(a, b, f, d), List(c, g, h, e), List(a, c, e, b), List(d, f, h, g))
-
-    faces.map(f => prefix + f.mkString("")).mkString("\n")
+    solutions(standard).foreach(println)
   }
 
   /** gets solutions of a puzzle using a brute force algorithm. */
@@ -130,7 +104,33 @@ object SnakeCube {
     * flat form where all of the sections in a single level. (i.e. z == 1 for all cubes) */
   def flatPuzzle(p: SnakeCubePuzzle) = p.copy(valid = (pos: Position) => pos.z == 1)
 
-  /** SnakeCube puzzle interface */
+  /** returns sketch format data representing a one of the solution. */
+  def showSteps(p: SnakeCubePuzzle) = steps(solutions(p).head).map(showCubes).mkString("\n")
+
+  def steps(solution: Solution) = solution.map(_.reverse).reverse.tail
+
+  /** returns polygon info of cubes for the sketching tool.
+    * @param positions the cube positions
+    **/
+  def showCubes(positions: List[Position]) = positions.map(p => cube2sketch(colors.next)(p)).mkString("\n")
+
+  /** returns polygon info of a single cube for the sketching tool. */
+  def cube2sketch(color: String)(a: Position) = {
+    val prefix = s"polygon[fill=$color]"
+    val Position(x, y, z) = a
+    val b = (x, y, z - 1)
+    val c = (x, y - 1, z)
+    val d = (x - 1, y, z)
+    val e = (x, y - 1, z - 1)
+    val f = (x - 1, y, z - 1)
+    val g = (x - 1, y - 1, z)
+    val h = (x - 1, y - 1, z - 1)
+    val faces = List(List(a, d, g, c), List(b, e, h, f), List(a, b, f, d), List(c, g, h, e), List(a, c, e, b), List(d, f, h, g))
+
+    faces.map(f => prefix + f.mkString("")).mkString("\n")
+  }
+
+  /** SnakeCube puzzle */
   case class SnakeCubePuzzle(sections: List[Int],
                              valid: Position => Boolean,
                              initialSolution: Solution,
