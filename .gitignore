@@ -11,6 +11,9 @@ tmp
 *.class
 *.log
 
+# for this project
+src/main/haskell
+
 # sbt specific
 .cache/
 .history/

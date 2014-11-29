@@ -2,10 +2,13 @@ package yuima.funcpearls
 
 /** Scala implementation of "Solving the Snake Cube Puzzle in Haskel."
   * http://web.cecs.pdx.edu/~mpj/snakecube/revised-SnakeCube.pdf
+  *
+  * Note: I did not implement a function "advance" in section 9.
+  *
   * @author Yuichiroh Matsubayashi
   *         Created on 14/11/28.
   */
-object SnakeCube extends App {
+object SnakeCube {
   type Section = List[Position]
   type Solution = List[Section]
 
@@ -13,33 +16,54 @@ object SnakeCube extends App {
 
   val standard = SnakeCubePuzzle(
     sections = snake,
-    valid = inCube(3) _,
+    valid = inCube(3)(_),
     initialSolution = List(List(Position(1, 1, 1))),
     initialDirection = Direction(0, 0, 1)
   )
 
   val meanGreen = standard.copy(sections = List(3, 3, 2, 3, 2, 3, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3))
 
-  val king = standard.copy(valid = inCube(4) _, sections = List(
+  val king = standard.copy(valid = inCube(4)(_), sections = List(
     3, 2, 3, 2, 2, 4, 2, 3, 2, 3, 2, 3, 2, 2, 2,
     2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 3, 4, 2,
     2, 2, 4, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2)
   )
 
   val king1 = king.copy(initialSolution = List(List(Position(2, 1, 1))))
-
   val king2 = king.copy(initialSolution = List(List(Position(1, 2, 2))))
 
-  solutions(reversePuzzle(standard)).foreach(println)
+  /** Colors used for visualization.
+    * Cubes having an odd index are brown and even index are white. */
+  val colors = Iterator.continually(Seq("brown", "white")).flatten
 
-  /** checks whether a given cube location is valid for a solution (it should be inside of the large cube).
-    * @param size the cube size of the solution (i.e. the cube is size * size * size)
-    * @param pos  the position of a target cube.
+  def main(args: Array[String]) {
+    println(showSteps(standard))
+  }
+
+  /** returns sketch format data representing a one of the solution. */
+  def showSteps(p: SnakeCubePuzzle) = steps(solutions(p).head).map(showCubes).mkString("\n")
+
+  def steps(solution: Solution) = solution.map(_.reverse).reverse.tail
+
+  /** returns polygon info of cubes for the sketching tool.
+    * @param positions the cube positions
     **/
-  def inCube(size: Int)(pos: Position) = {
-    def inRange(k: Int) = 1 <= k && k <= size
+  def showCubes(positions: List[Position]) = positions.map(p => cube2sketch(colors.next)(p)).mkString("\n")
 
-    inRange(pos.x) && inRange(pos.y) && inRange(pos.z)
+  /** returns polygon info of a single cube for the sketching tool. */
+  def cube2sketch(color: String)(a: Position) = {
+    val prefix = s"polygon[fill=$color]"
+    val Position(x, y, z) = a
+    val b = (x, y, z - 1)
+    val c = (x, y - 1, z)
+    val d = (x - 1, y, z)
+    val e = (x, y - 1, z - 1)
+    val f = (x - 1, y, z - 1)
+    val g = (x - 1, y - 1, z)
+    val h = (x - 1, y - 1, z - 1)
+    val faces = List(List(a, d, g, c), List(b, e, h, f), List(a, b, f, d), List(c, g, h, e), List(a, c, e, b), List(d, f, h, g))
+
+    faces.map(f => prefix + f.mkString("")).mkString("\n")
   }
 
   /** gets solutions of a puzzle using a brute force algorithm. */
@@ -92,6 +116,16 @@ object SnakeCube extends App {
   /** creates a variant of a puzzle by reversing the order of the sections. */
   def reversePuzzle(p: SnakeCubePuzzle) = p.copy(sections = p.sections.reverse)
 
+  /** checks whether a given cube location is valid for a solution (it should be inside of the large cube).
+    * @param size the cube size of the solution (i.e. the cube is size * size * size)
+    * @param pos  the position of a target cube.
+    **/
+  def inCube(size: Int)(pos: Position) = {
+    def inRange(k: Int) = 1 <= k && k <= size
+
+    inRange(pos.x) && inRange(pos.y) && inRange(pos.z)
+  }
+
   /** converts an objective of the puzzle to a different one --that is to find the most-compact,
     * flat form where all of the sections in a single level. (i.e. z == 1 for all cubes) */
   def flatPuzzle(p: SnakeCubePuzzle) = p.copy(valid = (pos: Position) => pos.z == 1)
@@ -106,5 +140,8 @@ object SnakeCube extends App {
     require(u.abs + v.abs + w.abs == 1 && u.abs <= 1 && v.abs <= 1 && w.abs <= 1)
   }
 
-  case class Position(x: Int, y: Int, z: Int)
+  case class Position(x: Int, y: Int, z: Int) {
+    override def toString = Seq(x, y, z).mkString("(", ",", ")")
+  }
+
 }

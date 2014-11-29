@@ -5,7 +5,7 @@ import yuima.funcpearls.SnakeCube._
 
 /**
  * @author Yuichiroh Matsubayashi
- *         Created on 14/11/28.
+ *         Created on 14/11/29.
  */
 class SnakeCubeSpec extends WordSpec with Matchers{
   "SnakeCube" when {
@@ -17,8 +17,8 @@ class SnakeCubeSpec extends WordSpec with Matchers{
       }
 
       """create correct sections from the inputs (start position, direction, length)""" in {
-        section(Position(1, 1, 1))(Direction(0, 1, 0))(3) should be(Stream(Position(1,2,1), Position(1,1,1)))
-        section(Position(1, 3, 1))(Direction(1, 0, 0))(3) should be(Stream(Position(2,3,1), Position(1,3,1)))
+        section(Position(1, 1, 1))(Direction(0, 1, 0))(3) should be(List(Position(1,3,1), Position(1,2,1)))
+        section(Position(1, 3, 1))(Direction(1, 0, 0))(3) should be(List(Position(3,3,1), Position(2,3,1)))
       }
 
       """solve the standard problem correctly.""" in {
@@ -27,6 +27,17 @@ class SnakeCubeSpec extends WordSpec with Matchers{
         List(List(Position(3,3,3), Position(3,3,2)), List(Position(3,3,1), Position(3,2,1)), List(Position(3,1,1), Position(3,1,2)), List(Position(3,1,3), Position(2,1,3)), List(Position(1,1,3)), List(Position(1,1,2)), List(Position(2,1,2)), List(Position(2,1,1), Position(2,2,1)), List(Position(2,3,1), Position(2,3,2)), List(Position(2,3,3)), List(Position(1,3,3)), List(Position(1,2,3), Position(2,2,3)), List(Position(3,2,3)), List(Position(3,2,2), Position(2,2,2)), List(Position(1,2,2)), List(Position(1,3,2)), List(Position(1,3,1), Position(1,2,1)), List(Position(1,1,1)))
         List(List(Position(3,3,3), Position(3,3,2)), List(Position(3,3,1), Position(2,3,1)), List(Position(1,3,1), Position(1,3,2)), List(Position(1,3,3), Position(1,2,3)), List(Position(1,1,3)), List(Position(1,1,2)), List(Position(1,2,2)), List(Position(1,2,1), Position(2,2,1)), List(Position(3,2,1), Position(3,2,2)), List(Position(3,2,3)), List(Position(3,1,3)), List(Position(2,1,3), Position(2,2,3)), List(Position(2,3,3)), List(Position(2,3,2), Position(2,2,2)), List(Position(2,1,2)), List(Position(3,1,2)), List(Position(3,1,1), Position(2,1,1)), List(Position(1,1,1)))
         List(List(Position(3,3,3), Position(3,2,3)), List(Position(3,1,3), Position(2,1,3)), List(Position(1,1,3), Position(1,2,3)), List(Position(1,3,3), Position(1,3,2)), List(Position(1,3,1)), List(Position(1,2,1)), List(Position(1,2,2)), List(Position(1,1,2), Position(2,1,2)), List(Position(3,1,2), Position(3,2,2)), List(Position(3,3,2)), List(Position(3,3,1)), List(Position(2,3,1), Position(2,3,2)), List(Position(2,3,3)), List(Position(2,2,3), Position(2,2,2)), List(Position(2,2,1)), List(Position(3,2,1)), List(Position(3,1,1), Position(2,1,1)), List(Position(1,1,1)))
+      }
+
+      """convert solution to visualization format.""" in {
+        showCubes(List(Position(1,1,1))) should be(
+          """polygon[fill=brown](1,1,1)(0,1,1)(0,0,1)(1,0,1)
+            |polygon[fill=brown](1,1,0)(1,0,0)(0,0,0)(0,1,0)
+            |polygon[fill=brown](1,1,1)(1,1,0)(0,1,0)(0,1,1)
+            |polygon[fill=brown](1,0,1)(0,0,1)(0,0,0)(1,0,0)
+            |polygon[fill=brown](1,1,1)(1,0,1)(1,0,0)(1,1,0)
+            |polygon[fill=brown](0,1,1)(0,1,0)(0,0,0)(0,0,1)""".stripMargin
+        )
       }
     }
   }
