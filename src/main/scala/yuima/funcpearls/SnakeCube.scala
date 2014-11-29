@@ -3,7 +3,7 @@ package yuima.funcpearls
 /** Scala implementation of "Solving the Snake Cube Puzzle in Haskel."
   * http://web.cecs.pdx.edu/~mpj/snakecube/revised-SnakeCube.pdf
   *
-  * Note: I did not implement a function "advance" in section 9.
+  * Note: No implementation for a function "advance" in section 9.
   *
   * @author Yuichiroh Matsubayashi
   *         Created on 14/11/28.
