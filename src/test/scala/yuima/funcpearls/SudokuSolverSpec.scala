@@ -50,7 +50,7 @@ class SudokuSolverSpec extends WordSpec with Matchers {
           ))
       }
 
-      """prune candidates that are already used in other cells in the same row.""" in {
+      """prune candidates that are already used in the other cells in the same row.""" in {
         solver.pruneBy[Char](solver.rows)(solver.choices(board)) should be(
           List(
             List(List('1'), List('2', '4'), List('3'), List('2', '4')),
@@ -60,7 +60,7 @@ class SudokuSolverSpec extends WordSpec with Matchers {
           ))
       }
 
-      """prune candidates that are already used in other cells in the same col.""" in {
+      """prune candidates that are already used in the other cells in the same col.""" in {
         solver.pruneBy[Char](solver.cols)(solver.choices(board)) should be(
           List(
             List(List('1'), List('1', '2', '3', '4'), List('3'), List('1', '4')),
@@ -70,7 +70,7 @@ class SudokuSolverSpec extends WordSpec with Matchers {
           ))
       }
 
-      """prune candidates that are already used in other cells in the same box.""" in {
+      """prune candidates that are already used in the other cells in the same box.""" in {
         solver.pruneBy[Char](solver.boxes)(solver.choices(board)) should be(
           List(
             List(List('1'), List('2', '4'), List('3'), List('1', '4')),
@@ -80,7 +80,7 @@ class SudokuSolverSpec extends WordSpec with Matchers {
           ))
       }
 
-      """prune candidates that are already used in other cells in the same row, col and box.""" in {
+      """prune candidates that are already used in the other cells in the same row, col and box.""" in {
         solver.prune(solver.choices(board)) should be(
           List(
             List(List('1'), List('2'), List('3'), List('4')),
@@ -142,7 +142,6 @@ class SudokuSolverSpec extends WordSpec with Matchers {
       println(solver.showBoard(board))
 
       """solve the problem.""" in {
-        println
         solver.showBoard(solver.solutions(board)(0)) should be(
           """9 2 3 | 5 1 8 | 7 6 4
             |1 7 8 | 6 4 9 | 2 3 5
