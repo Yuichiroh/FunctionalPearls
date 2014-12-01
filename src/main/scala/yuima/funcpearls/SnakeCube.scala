@@ -1,5 +1,7 @@
 package yuima.funcpearls
 
+import scala.annotation.tailrec
+
 /** Scala implementation of "Solving the Snake Cube Puzzle in Haskel."
   * http://web.cecs.pdx.edu/~mpj/snakecube/revised-SnakeCube.pdf
   *
