@@ -91,8 +91,8 @@ class SudokuSolver(val boardSize: Int = 9,
   }
 
   /** explores solutions by incrementally fixing the cell which has the smallest number of choices.
-    * if the leaf board has one or more cells may contain zero choices, or the same fixed choice may
-    * occur in two or more positions in the same row, column or box, we stop searching that board.
+    * Searching is stoped if the leaf board has one or more cells that may contain zero choices or
+    * if the same fixed choice may occur in two or more positions in the same row, column or box.
     * */
   def search[T](m: Matrix[Choices[T]]): Choices[Matrix[Choices[T]]] = {
     def blocked(m: Matrix[Choices[T]]) = void(m) || !safe(m)
@@ -113,7 +113,7 @@ class SudokuSolver(val boardSize: Int = 9,
 
   def cols[T](a: Matrix[T]) = a.transpose
 
-  /** generate a list of matrices in which the first cell having the smallest number of choices is expanded. */
+  /** generate a list of matrices where the first cell having the smallest number of choices is expanded. */
   def expand[T](m: Matrix[Choices[T]]): Choices[Matrix[Choices[T]]] = {
     val minChoice = m.flatMap(_.map(_.size).filter(_ > 1)).min
     lazy val (rows1, row :: rows2) = m.splitAt(m.indexWhere(_.exists(best)))
